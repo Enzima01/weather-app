@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -14,8 +15,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -99,7 +98,7 @@ public class Program extends JFrame {
 		JLabel lblCidadeEstado = new JLabel("");
 		lblCidadeEstado.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCidadeEstado.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		lblCidadeEstado.setBounds(75, 332, 322, 39);
+		lblCidadeEstado.setBounds(10, 332, 453, 39);
 		contentPane.add(lblCidadeEstado);
 
 		JLabel lblPais = new JLabel("");
@@ -128,22 +127,28 @@ public class Program extends JFrame {
 
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				String cidade = txtCidade.getText().trim();
-
+				
 				if (cidade.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Digite uma cidade!", "Aviso", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 
 				try {
+					btnBuscar.setEnabled(false);
 					String weatherData = getWeatherData(cidade);
-					JSONObject json = new JSONObject(weatherData);
+					
+					if (!weatherData.trim().startsWith("{")) {
+					    throw new Exception("Resposta inválida da API:\n" + weatherData);
+					}
+					
+					JSONObject jsonData = new JSONObject(weatherData);
 
-					if (json.has("error")) {
+					if (jsonData.has("error")) {
 						JOptionPane.showMessageDialog(null, "Localização não encontrada!", "Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-
-						JSONObject jsonData = new JSONObject(weatherData);
+						
 						JSONObject info = jsonData.getJSONObject("current");
 						JSONObject condition = info.getJSONObject("condition");
 
@@ -168,15 +173,18 @@ public class Program extends JFrame {
 						lblTemperatura.setText(Float.toString(temperatura) + "°C");
 
 						// condição
-						String weatherCondition = info.getJSONObject("condition").getString("text");
+						String weatherCondition = condition.getString("text");
 						lblCondicao.setText(weatherCondition);
 
 						// data-hora
 						String dateTimeString = info.getString("last_updated");
 						lblDataHora.setText(dateTimeString);
 					}
+					
 				} catch (Exception e1) {
-					System.out.println(e1.getMessage());
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}finally {
+					btnBuscar.setEnabled(true);
 				}
 			}
 		});
@@ -185,11 +193,14 @@ public class Program extends JFrame {
 
 	private static String getWeatherData(String cidade) throws Exception {
 
-		String apiKey = Files.readString(Paths.get("api-key.txt")).trim();
+		InputStream is = Program.class.getResourceAsStream("/api-key.txt");
 
-		if (apiKey.isEmpty()) {
-			throw new Exception("API Key vazia!");
+		if (is == null) {
+		    throw new Exception("Arquivo api-key.txt não encontrado!");
 		}
+
+		String apiKey = new String(is.readAllBytes()).trim();
+		is.close();
 
 		String cityNameFormat = URLEncoder.encode(cidade, StandardCharsets.UTF_8);
 		String apiUrl = "https://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + cityNameFormat;
@@ -200,10 +211,19 @@ public class Program extends JFrame {
 		// cria um objeto para enviar solicitações http e receber respostas http
 		HttpClient client = HttpClient.newHttpClient();
 
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		for (int i = 0; i < 3; i++) {
+		    try {
+		        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-		return response.body(); // retorna os dados obtidos do site da api
+		        return response.body();
 
+		    } catch (Exception e) {
+		        if (i == 2) throw e;
+		        Thread.sleep(1000); // espera 1 segundo
+		    }
+		}
+
+		throw new Exception("Falha ao conectar com a API");
 	}
 
 }
