@@ -1,6 +1,6 @@
 # Weather App 🌤️
 
-Aplicação em Java que consulta dados de clima utilizando uma API online.
+Aplicação em Java que consulta dados de clima utilizando uma API online
 
 ## Versões
 
@@ -26,10 +26,19 @@ weather-app
  └── weather-gui
      └── versão com interface gráfica
 ```
+## Execução
+
+O projeto gráfico pode ser executado via arquivo `.jar` no terminal
+
+#### GUI
+```bash
+java -jar WeatherApp.jar
+```
 
 ## API utilizada
 
 https://www.weatherapi.com/
+
 
 ## Autor
 
