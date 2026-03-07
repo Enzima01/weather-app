@@ -1,4 +1,4 @@
-# Weather App
+# Weather App 🌤️
 
 Aplicação em Java que consulta dados de clima utilizando uma API online.
 
