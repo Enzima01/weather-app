@@ -2,8 +2,6 @@
 
 Aplicação em Java que consulta dados de clima utilizando uma API online.
 
-Este repositório contém duas versões do projeto.
-
 ## Versões
 
 * **CLI** – versão executada no terminal
