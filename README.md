@@ -18,9 +18,9 @@ Aplicação em Java que consulta dados de clima utilizando uma API online.
 
 ```
 weather-app
- ├── cli
+ ├── weather-cli
  │   └── versão de linha de comando
- └── gui
+ └── weather-gui
      └── versão com interface gráfica
 ```
 
