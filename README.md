@@ -14,13 +14,16 @@ Aplicação em Java que consulta dados de clima utilizando uma API online.
 * JSON (org.json)
 * WeatherAPI
 
+## Wireframe
+<img width="1047" height="657" alt="wireframe" src="https://github.com/user-attachments/assets/d80504c9-7ca7-432c-83a7-64825f28c28a" />
+
 ## Estrutura do Projeto
 
 ```
 weather-app
- ├── cli
+ ├── weather-cli
  │   └── versão de linha de comando
- └── gui
+ └── weather-gui
      └── versão com interface gráfica
 ```
 
