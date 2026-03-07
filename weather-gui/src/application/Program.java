@@ -104,25 +104,25 @@ public class Program extends JFrame {
 		JLabel lblPais = new JLabel("");
 		lblPais.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPais.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		lblPais.setBounds(126, 382, 221, 26);
+		lblPais.setBounds(15, 382, 443, 26);
 		contentPane.add(lblPais);
 
 		JLabel lblTemperatura = new JLabel("");
 		lblTemperatura.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTemperatura.setFont(new Font("SansSerif", Font.PLAIN, 50));
-		lblTemperatura.setBounds(52, 227, 369, 107);
+		lblTemperatura.setBounds(10, 227, 453, 107);
 		contentPane.add(lblTemperatura);
 
 		JLabel lblCondicao = new JLabel("");
 		lblCondicao.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCondicao.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		lblCondicao.setBounds(102, 198, 268, 26);
+		lblCondicao.setBounds(10, 198, 453, 26);
 		contentPane.add(lblCondicao);
 
 		JLabel lblDataHora = new JLabel("");
 		lblDataHora.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDataHora.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		lblDataHora.setBounds(151, 448, 171, 29);
+		lblDataHora.setBounds(15, 448, 443, 29);
 		contentPane.add(lblDataHora);
 
 		btnBuscar.addActionListener(new ActionListener() {
