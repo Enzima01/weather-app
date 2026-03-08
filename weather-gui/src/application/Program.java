@@ -137,10 +137,12 @@ public class Program extends JFrame {
 
 				try {
 					btnBuscar.setEnabled(false);
+				
 					String weatherData = getWeatherData(cidade);
 					
 					if (!weatherData.trim().startsWith("{")) {
-					    throw new Exception("Resposta inválida da API:\n" + weatherData);
+						JOptionPane.showMessageDialog(null,"Não foi possível obter os dados do clima. Tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
+						return;
 					}
 					
 					JSONObject jsonData = new JSONObject(weatherData);
@@ -206,7 +208,7 @@ public class Program extends JFrame {
 		String apiUrl = "https://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + cityNameFormat;
 
 		// constroi uma solicitação http e define a uri da solicitação
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).build();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).timeout(java.time.Duration.ofSeconds(5)).build();
 
 		// cria um objeto para enviar solicitações http e receber respostas http
 		HttpClient client = HttpClient.newHttpClient();

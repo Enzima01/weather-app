@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="weather-cli/src"/>
+	<classpathentry kind="src" path="weather-gui/src"/>
+	<classpathentry kind="lib" path="weather-gui/jar/WeatherApp.jar"/>
+	<classpathentry kind="output" path="weather-cli/bin"/>
+</classpath>
