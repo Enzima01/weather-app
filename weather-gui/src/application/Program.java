@@ -39,6 +39,7 @@ public class Program extends JFrame {
 
 	public static void main(String[] args) {
 
+		// UI personalizada
 		try {
 			UIManager.setLookAndFeel(new FlatLightLaf());
 		} catch (Exception ex) {
@@ -125,69 +126,85 @@ public class Program extends JFrame {
 		lblDataHora.setBounds(15, 448, 443, 29);
 		contentPane.add(lblDataHora);
 
+		JLabel gifLoading = new JLabel("");
+		gifLoading.setHorizontalAlignment(SwingConstants.CENTER);
+		gifLoading.setFont(new Font("SansSerif", Font.PLAIN, 20));
+		gifLoading.setBackground(Color.RED);
+		gifLoading.setBounds(399, 36, 64, 64);
+		contentPane.add(gifLoading);
+
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				String cidade = txtCidade.getText().trim();
-				
+
 				if (cidade.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Digite uma cidade!", "Aviso", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 
-				try {
-					btnBuscar.setEnabled(false);
-				
-					String weatherData = getWeatherData(cidade);
-					
-					if (!weatherData.trim().startsWith("{")) {
-						JOptionPane.showMessageDialog(null,"Não foi possível obter os dados do clima. Tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-					JSONObject jsonData = new JSONObject(weatherData);
+				btnBuscar.setEnabled(false);
 
-					if (jsonData.has("error")) {
-						JOptionPane.showMessageDialog(null, "Localização não encontrada!", "Error", JOptionPane.ERROR_MESSAGE);
-					} else {
-						
+				// gif
+				gifLoading.setIcon(new ImageIcon(getClass().getResource("/imgs/loading16px.gif")));
+
+				new Thread(() -> {
+
+					try {
+
+						String weatherData = getWeatherData(cidade);
+
+						JSONObject jsonData = new JSONObject(weatherData);
+
+						if (jsonData.has("error")) {
+							JOptionPane.showMessageDialog(null, "Localização não encontrada!");
+							gifLoading.setIcon(null);
+							btnBuscar.setEnabled(true);
+							return;
+						}
+
 						JSONObject info = jsonData.getJSONObject("current");
 						JSONObject condition = info.getJSONObject("condition");
 
-						// foto
-						String foto = condition.getString("icon");
-						foto = "https:" + foto;
+						String foto = "https:" + condition.getString("icon");
 						ImageIcon icon = new ImageIcon(new URL(foto));
 						Image img = icon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
-						fotoClima.setIcon(new ImageIcon(img));
 
-						// cidade e estado
-						cidade = jsonData.getJSONObject("location").getString("name");
+						String cidadeNome = jsonData.getJSONObject("location").getString("name");
 						String estado = jsonData.getJSONObject("location").getString("region");
-						lblCidadeEstado.setText(cidade + " - " + estado);
-
-						// pais
 						String pais = jsonData.getJSONObject("location").getString("country");
-						lblPais.setText(pais);
 
-						// tempetarura
 						float temperatura = info.getFloat("temp_c");
-						lblTemperatura.setText(Float.toString(temperatura) + "°C");
-
-						// condição
 						String weatherCondition = condition.getString("text");
-						lblCondicao.setText(weatherCondition);
-
-						// data-hora
 						String dateTimeString = info.getString("last_updated");
-						lblDataHora.setText(dateTimeString);
+
+						// atualizar interface
+						EventQueue.invokeLater(() -> {
+
+							fotoClima.setIcon(new ImageIcon(img));
+							lblCidadeEstado.setText(cidadeNome + " - " + estado);
+							lblPais.setText(pais);
+							lblTemperatura.setText(temperatura + "°C");
+							lblCondicao.setText(weatherCondition);
+							lblDataHora.setText(dateTimeString);
+
+							gifLoading.setIcon(null);
+							btnBuscar.setEnabled(true);
+
+						});
+
+					} catch (Exception ex) {
+
+						EventQueue.invokeLater(() -> {
+							JOptionPane.showMessageDialog(null, ex.getMessage());
+							btnBuscar.setEnabled(true);
+							gifLoading.setIcon(null);
+						});
+
 					}
-					
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}finally {
-					btnBuscar.setEnabled(true);
-				}
+
+				}).start();
+
 			}
 		});
 
@@ -198,7 +215,7 @@ public class Program extends JFrame {
 		InputStream is = Program.class.getResourceAsStream("/api-key.txt");
 
 		if (is == null) {
-		    throw new Exception("Arquivo api-key.txt não encontrado!");
+			throw new Exception("Arquivo api-key.txt não encontrado!");
 		}
 
 		String apiKey = new String(is.readAllBytes()).trim();
@@ -214,18 +231,17 @@ public class Program extends JFrame {
 		HttpClient client = HttpClient.newHttpClient();
 
 		for (int i = 0; i < 3; i++) {
-		    try {
-		        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			try {
+				HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-		        return response.body();
+				return response.body();
 
-		    } catch (Exception e) {
-		        if (i == 2) throw e;
-		        Thread.sleep(1000); // espera 1 segundo
-		    }
+			} catch (Exception e) {
+				if (i == 2) throw e;
+				Thread.sleep(1000); // espera 1 segundo
+			}
 		}
 
 		throw new Exception("Falha ao conectar com a API");
 	}
-
 }
